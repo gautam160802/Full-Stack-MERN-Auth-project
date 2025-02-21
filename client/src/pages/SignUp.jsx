@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // Define error state
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -13,11 +14,33 @@ const SignUp = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Handle form submission logic
-    setLoading(false);
+    setError(null); // Reset error state
+
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      console.log("User created successfully:", data);
+      // You can redirect the user or show a success message
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,15 +77,16 @@ const SignUp = () => {
         >
           {loading ? "Loading..." : "Sign Up"}
         </button>
-        {/* Ensure OAuth is properly imported if used */}
-        {/* <OAuth /> */}
       </form>
+      {error && <p className="text-red-500 text-center mt-3">{error}</p>}{" "}
+      {/* Display error message */}
       <div className="flex gap-2 mt-5">
         <p>Have an account?</p>
         <Link to="/sign-in">
           <span className="text-blue-500">Sign in</span>
         </Link>
       </div>
+      <p className="text-red-700 mt-5">{error && "Something went wrong"}</p>
     </div>
   );
 };
