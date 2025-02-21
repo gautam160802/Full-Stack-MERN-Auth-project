@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null); // Define error state
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -33,7 +34,7 @@ const SignUp = () => {
       if (!res.ok) {
         throw new Error(data.message || "Something went wrong");
       }
-
+      navigate("/sign-in"); // Redirect to home page
       console.log("User created successfully:", data);
       // You can redirect the user or show a success message
     } catch (err) {
